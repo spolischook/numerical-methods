@@ -3,7 +3,7 @@
 There are collection of many kinds of numerical methods that can be involved in
 real-world problem solving.
 
-See the [course-project](#)
+See the [course-project](https://kotoblog.pp.ua/numerical-methods-tasks/course-project/)
 
 References:
 
