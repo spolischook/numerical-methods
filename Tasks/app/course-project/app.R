@@ -2,14 +2,23 @@ library(shiny)
 library(DT)
 library(markdown)
 library(readtext)
-source('../../../includes/lagrange_polynomial.R')
-source('../../../includes/makeXYmatrix.R')
-source('../../../includes/numerical_methods.R')
+source('../../../includes/lagrange_polynomial.R', chdir = T)
+source('../../../includes/makeXYmatrix.R', chdir = T)
+source('../../../includes/method_iteration.R', chdir = T)
+source('../../../includes/method_dichotomy.R', chdir = T)
 
 f1 <- function(x) {
   return (x ^ 2 - cos(x))
 }
-f2 <- function(x) {
+df1 <- function(x) {
+  return (2*x + sin(x))
+}
+f2 <- function(v) {
+  return (function(x) {
+    return (v['A']*x^12 + v['B']*x^10 + v['C']*x^8 + v['D']*x^6 + v['E']*x^4 + v['F']*x^2 + v['G'])
+  })
+}
+f3 <- function(x) {
   return (1 / (1 + x))
 }
 
@@ -24,13 +33,14 @@ ui <- navbarPage(
     
     sidebarLayout(
       sidebarPanel(
+        includeMarkdown("tasks/task1.md"),
         withMathJax(),
         splitLayout(
           tags$h3("\\(x^{2}-cos(x) = \\)"),
           numericInput('y', '', 0, step=0.1)
         ),
         sliderInput(
-          "borders",
+          "task1borders",
           "Межі функції:",
           min = -4,
           max = 4,
@@ -46,7 +56,7 @@ ui <- navbarPage(
           value = 3
         ),
         selectInput(
-          "method",
+          "task1method",
           "Метод розв'язку:",
           c(
             "Ітерацій"  = "iteration",
@@ -61,7 +71,7 @@ ui <- navbarPage(
       mainPanel(
         plotOutput("task1plot"),
         tags$h4('Пошук коренів: '),
-        DT::dataTableOutput("task1datatable")
+        DT::dataTableOutput("task1calc")
       )
     )
   ),
@@ -74,6 +84,7 @@ ui <- navbarPage(
     ),
     sidebarLayout(
       sidebarPanel(
+        includeMarkdown("tasks/task2.md"),
         sliderInput(
           "variant",
           "Варіант: ",
@@ -81,10 +92,32 @@ ui <- navbarPage(
           max = 6,
           step = 1,
           value = 1
-        )
+        ),
+        sliderInput(
+          "task2borders",
+          "Межі функції:",
+          min = -10,
+          max = 10,
+          step = 0.1,
+          value = c(-4, 4)
+        ),
+        selectInput(
+          "task2method",
+          "Метод розв'язку:",
+          c(
+            "Ітерацій"  = "iteration",
+            "Дихотомії" = "dichotomy",
+            "Н'ютона"   = "newton"
+          )
+        ),
+        tags$h4('Корені рівняння: '),
+        DT::dataTableOutput("task2roots")
       ),
       mainPanel(
-        DT::dataTableOutput("task2variants")
+        plotOutput("task2plot"),
+        DT::dataTableOutput("task2variants"),
+        tags$h4('Пошук коренів: '),
+        DT::dataTableOutput("task2calc")
       )
     )
   ),
@@ -132,7 +165,15 @@ ui <- navbarPage(
       ),
       
       mainPanel(plotOutput("task4plot"),
-                uiOutput('task4solution'))
+        uiOutput('task4solution'),
+        withMathJax(),
+        tags$h3(
+          "\\(L(x) = \\sum_{j=0}^{n}y_{j}l_{j}(x)\\)"
+        ),
+        tags$h3(
+          "\\(l_{j}(x) = \\prod_{i=0; j\\neq i}^{n} \\frac{x -x_{i}}{x_{j} - x_{i}}\\)"
+        )
+      )
     )
   )
   
@@ -140,8 +181,8 @@ ui <- navbarPage(
 
 server <- function(input, output, session) {
   output$task1plot <- renderPlot({
-    Xs <- input$borders[1]
-    Xe <- input$borders[2]
+    Xs <- input$task1borders[1]
+    Xe <- input$task1borders[2]
     y  <- input$y
     x  <- seq(Xs, Xe, by = 0.001)
     precision <- input$precision
@@ -150,57 +191,58 @@ server <- function(input, output, session) {
     plot(x, f1(x), type = 'l')
     abline(h = y)
 
-    switch(input$method, 
+    switch(input$task1method,
       iteration={
         result <- iteration(f1, Xs, Xe, y, 10^-precision)
-        output$task1datatable <- DT::renderDataTable({
-          DT::datatable(result[[1]])
-        })
-        output$task1roots <- DT::renderDataTable({
-          DT::datatable(
-            result[[2]],
-            list(
-              'paging' = FALSE,
-              'searching' = FALSE
-            )
-          )
-        })
-        for (i in seq_along(result[[2]][ , 'x'])) {
-          points(
-            result[[2]][i, 'x'],
-            result[[2]][i, 'y'],
-            col='red'
-          )
-        }
       },
       dichotomy={
-       print('dichotomy')    
+        result <- dichotomy(f1, Xs, Xe, y, 10^-precision)
       },
       newton={
        print('newton')
       }
     )
+
+    output$task1calc <- DT::renderDataTable({
+      DT::datatable(result[[1]])
+    })
+    output$task1roots <- DT::renderDataTable({
+      DT::datatable(
+        result[[2]],
+        list(
+          'paging' = FALSE,
+          'searching' = FALSE
+        )
+      )
+    })
+    for (i in seq_along(result[[2]][ , 'x'])) {
+      points(
+        result[[2]][i, 'x'],
+        result[[2]][i, 'y'],
+        col='red'
+      )
+    }
   })
-  
+
   # Task2
   m = matrix(
-      data = c(
-         0.01,      0,           0,            0.1,         1,           0,
-         1,         0.01,        0.02,        -20,         -29900,       1,
-        -78,        1,           0.1,          102,        -29900,       1,
-         2.1*10^3, -1.25*10^3,  -2.56*10^3,   -8.98*10^3,   0,          -116,
-        -2.5*10^4,  1.85*10^5,   3.45*10^5,    8.76*10^6,   26400,       4.3*10^3,
-         1.2*10^5, -8.75*10^6,  -9.95*10^6,   -7.5*10^5,    9.12*10^8,  -5.3*10.4,
-        -1.9*10^5,  8.9*10^7,    2.7*10^7,    -3.3*10^8,    -1.75*10^9,  8.9*10^4
-      ),
-      nrow = 7,
-      ncol = 6,
-      byrow = TRUE,
-      dimnames = list(
-        LETTERS[seq( from = 1, to = 7 )],
-        seq(1,6)
-      )
+    data = c(
+       0.01,      0,           0,            0.1,         1,           0,
+       1,         0.01,        0.02,        -20,         -29900,       1,
+      -78,        1,           0.1,          102,        -29900,       1,
+       2.1*10^3, -1.25*10^3,  -2.56*10^3,   -8.98*10^3,   0,          -116,
+      -2.5*10^4,  1.85*10^5,   3.45*10^5,    8.76*10^6,   26400,       4.3*10^3,
+       1.2*10^5, -8.75*10^6,  -9.95*10^6,   -7.5*10^5,    9.12*10^8,  -5.3*10.4,
+      -1.9*10^5,  8.9*10^7,    2.7*10^7,    -3.3*10^8,    -1.75*10^9,  8.9*10^4
+    ),
+    nrow = 7,
+    ncol = 6,
+    byrow = TRUE,
+    dimnames = list(
+      LETTERS[seq( from = 1, to = 7 )],
+      seq(1,6)
     )
+  )
   output$task2variants <- DT::renderDataTable(
     m,
     options = list(
@@ -208,13 +250,57 @@ server <- function(input, output, session) {
       'searching' = FALSE
     )
   )
+  output$task2plot <- renderPlot({
+    Xs <- input$task2borders[1]
+    Xe <- input$task2borders[2]
+    y = 0
+    precision=3
+    f <- f2(m[ ,input$variant])
+
+    x <- seq(Xs, Xe, by=0.01)
+    par(mai = c(1, 1, 0, 1))
+    plot(x, f(x), type='l', ylab='f(x)')
+    abline(h = y)
+
+    switch(input$task2method,
+      iteration={
+        result <- iteration(f, Xs, Xe, y, 10^-precision)
+      },
+      dichotomy={
+        result <- dichotomy(f, Xs, Xe, y, 10^-precision)
+      },
+      newton={
+       print('newton')
+      }
+    )
+
+    output$task2calc <- DT::renderDataTable({
+      DT::datatable(result[[1]])
+    })
+    output$task2roots <- DT::renderDataTable({
+      DT::datatable(
+        result[[2]],
+        list(
+          'paging' = FALSE,
+          'searching' = FALSE
+        )
+      )
+    })
+    for (i in seq_along(result[[2]][ , 'x'])) {
+      points(
+        result[[2]][i, 'x'],
+        result[[2]][i, 'y'],
+        col='red'
+      )
+    }
+  })
   
   # Task4
   output$task4plot <- renderPlot({
     left  <- input$task4borders[1]
     right <- input$task4borders[2]
     X <- seq(left, right, by = 0.001)
-    Y <- f2(X)
+    Y <- f3(X)
     maxY <- max(Y) + 1
     minY <- min(Y) - 1
     
@@ -233,7 +319,7 @@ server <- function(input, output, session) {
            else
              maxY))
     points(x,
-           f2(x),
+           f3(x),
            col = rgb(0, 0, 1, 0.5))
     
     abline(h = 0)
@@ -242,7 +328,7 @@ server <- function(input, output, session) {
     left  <- input$task4borders[1]
     right <- input$task4borders[2]
     x <- seq(left, right, by = (right - left) / task4GraphicPercise)
-    m <- makeXYmatrix(x, f2)
+    m <- makeXYmatrix(x, f3)
     
     lagrange <- lagrangePolynomial(x, m)
     m <- cbind(m, lagrange)

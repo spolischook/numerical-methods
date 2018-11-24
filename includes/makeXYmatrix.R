@@ -1,4 +1,4 @@
-# Title     : Make X\Y matrix
+# Title     : X\Y matrix
 # Objective : Make matrix with x and y rows
 # Created by: spolischook
 # Created on: 16.11.18

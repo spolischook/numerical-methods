@@ -36,7 +36,7 @@ f <- function(x) {
 }
 
 x = seq(-1.2, -0.8, by=0.1)
-f2 <- function(x) {
+f3 <- function(x) {
     return (1/(1+x))
 }
 
@@ -60,6 +60,6 @@ makeXYmatrix <- function(v, f) {
     return (m)
 }
 
-m = makeXYmatrix(x, f2)
+m = makeXYmatrix(x, f3)
 result = lagrangePolynomial(-0.96, m)
 r=1
