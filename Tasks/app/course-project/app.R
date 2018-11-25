@@ -6,6 +6,7 @@ source('../../../includes/lagrange_polynomial.R', chdir = T)
 source('../../../includes/makeXYmatrix.R', chdir = T)
 source('../../../includes/method_iteration.R', chdir = T)
 source('../../../includes/method_dichotomy.R', chdir = T)
+source('../../../includes/method_newton.R', chdir = T)
 
 f1 <- function(x) {
   return (x ^ 2 - cos(x))
@@ -51,7 +52,7 @@ ui <- navbarPage(
           "precision",
           "Точність:",
           min = 1,
-          max = 4,
+          max = 10,
           step = 1,
           value = 3
         ),
@@ -106,8 +107,7 @@ ui <- navbarPage(
           "Метод розв'язку:",
           c(
             "Ітерацій"  = "iteration",
-            "Дихотомії" = "dichotomy",
-            "Н'ютона"   = "newton"
+            "Дихотомії" = "dichotomy"
           )
         ),
         tags$h4('Корені рівняння: '),
@@ -193,13 +193,15 @@ server <- function(input, output, session) {
 
     switch(input$task1method,
       iteration={
+        iN = abs(Xs - Xe)/10^-precision
+        if (iN > 10000) stop(simpleError("Too much iterations"))
         result <- iteration(f1, Xs, Xe, y, 10^-precision)
       },
       dichotomy={
         result <- dichotomy(f1, Xs, Xe, y, 10^-precision)
       },
       newton={
-       print('newton')
+        result <- nm.newton(f1, df1, Xs, Xe, y, 10^-precision)
       }
     )
 
@@ -268,9 +270,6 @@ server <- function(input, output, session) {
       },
       dichotomy={
         result <- dichotomy(f, Xs, Xe, y, 10^-precision)
-      },
-      newton={
-       print('newton')
       }
     )
 
