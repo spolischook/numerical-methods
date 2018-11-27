@@ -4,7 +4,7 @@
 # Created on: 16.11.18
 
 makeXYmatrix <- function(v, f) {
-  m = matrix(
+  m <- matrix(
     nrow = length(v),
     ncol = 2,
     dimnames = list(
