@@ -15,7 +15,7 @@ is.in_range <- function(x, x0, x1) {
   return (FALSE)
 }
 
-nm.newton.findX <- function(x, f, df, Xs, Xe, y, precision) {
+nm.newton.findX <- function(x, f, df, Xs, Xe, precision) {
   X0 <- x
   Xn <- nm.newton.Xn(x, f, df)
   Yx <- f(Xn)
@@ -36,12 +36,12 @@ nm.newton.findX <- function(x, f, df, Xs, Xe, y, precision) {
   return (list(calc, results))
 }
 
-nm.newton <- function(f, df, Xs, Xe, y, precision) {
-  resultsS <- nm.newton.findX(Xs, f, df, Xs, Xe, y, precision)
+nm.newton <- function(f, df, Xs, Xe, precision) {
+  resultsS <- nm.newton.findX(Xs, f, df, Xs, Xe, precision)
   results  <- resultsS[[2]]
   calc     <- resultsS[[1]]
 
-  resultsE <- nm.newton.findX(Xe, f, df, Xs, Xe, y, precision)
+  resultsE <- nm.newton.findX(Xe, f, df, Xs, Xe, precision)
   results  <- merge(results, resultsE[[2]], all = TRUE)
   calc     <- merge(calc,    resultsE[[1]], all = TRUE)
 
