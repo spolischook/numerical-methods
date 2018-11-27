@@ -45,15 +45,7 @@ integralS.monteCarlo <- function(a, b, f, length.out, plot=FALSE) {
   Y <- maxY - minY
   X <- b - a
   S <- Y * X * ratio
-if (length.out == 10) {
-  print(in.f)
-  print(paste('Sum:', sum(in.f)))
-  print(paste('Ratio:', sum(in.f)/runs))
-  print(paste('Y:', maxY - minY))
-  print(paste('X:', b - a))
-  print(paste('S:', Y * X * ratio))
-  print(paste('plot:', plot))
-}
+
   if (plot) {
     points(xs,ys,pch='0',col=ifelse(in.f,"blue","grey")
      ,xlab='',ylab='',asp=1)

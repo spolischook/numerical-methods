@@ -363,7 +363,6 @@ server <- function(input, output, session) {
         'searching' = FALSE
       )
     )
-    # integralS.monteCarlo(Xs, Xe, f3, precisions[input$task3precision], plot=TRUE)
   })
 
   # Task4
