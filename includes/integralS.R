@@ -37,7 +37,7 @@ integralS.monteCarlo <- function(a, b, f, length.out, plot=FALSE) {
   xs <- runif(runs, min=a, max=b)
   ys <- runif(runs, min=minY, max=maxY)
 
-  fys <- f3(xs)
+  fys <- f(xs)
   in.f <- fys >= ys & fys > 0 & ys > 0 | fys <= ys & fys < 0 & ys <  0
 
   ratio <- (sum(in.f)/runs)
