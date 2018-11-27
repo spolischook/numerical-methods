@@ -44,6 +44,7 @@ ui <- navbarPage(
           tags$h3("\\(x^{2}-cos(x) = \\)"),
           numericInput('y', '', 0, step=0.1)
         ),
+        tags$h3("\\({f}'(x) = 2x + sin(x)\\)"),
         sliderInput(
           "task1borders",
           "Межі функції:",
@@ -148,6 +149,15 @@ ui <- navbarPage(
           max = 5,
           step = 1,
           value = 3
+        ),
+        withMathJax(),
+        tags$h3("Аналітичне значення:"),
+        tags$h4(
+          "\\(\\int_{a}^{b}\\frac{1}{1+x}dx = ln\\left ( \\frac{1+b}{1+a} \\right )\\)"
+        ),
+        tags$h3("Метод Сімпсона:"),
+        tags$h4(
+          "\\(\\int_{-h}^{h}P(x)dx = \\frac{h}{3}(y_{0}+4y_{1}+y_{2}))\\)"
         )
       ),
       
