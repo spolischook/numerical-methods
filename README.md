@@ -5,6 +5,8 @@ real-world problem solving.
 
 See the [course-project](https://kotoblog.pp.ua/numerical-methods-tasks/course-project/)
 
+
+
 References:
 
 - [Introduction to Monte Carlo Methods [DataCamp]](https://www.datacamp.com/community/tutorials/tutorial-monte-carlo)
@@ -13,3 +15,7 @@ References:
 - [Polynomial functions](http://www.mathcentre.ac.uk/resources/uploaded/mc-ty-polynomial-2009-1.pdf)
 - [Таблиця похідних [Wikipedia]](https://en.wikipedia.org/wiki/Differentiation_rules)
 - [Многочлен Лагранжа [Wikipedia]](https://en.wikipedia.org/wiki/Lagrange_polynomial)
+- [Метод Сімпсона en [MIT video]](https://www.youtube.com/watch?v=uc4xJsi99bk)
+- [NUMERICAL INTEGRATION METHODS FOR BALLISTIC ROCKET TRAJECTORY SIMULATION PROGRAMS](https://apps.dtic.mil/dtic/tr/fulltext/u2/658064.pdf)
+- [Метод Monte Carlo на мові програмування R](https://www.countbayesie.com/blog/2015/3/3/6-amazing-trick-with-monte-carlo-simulations)
+- [R Language Definition](https://cran.r-project.org/doc/manuals/r-release/R-lang.html)
