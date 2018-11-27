@@ -7,6 +7,7 @@ source('../../../includes/makeXYmatrix.R', chdir = T)
 source('../../../includes/method_iteration.R', chdir = T)
 source('../../../includes/method_dichotomy.R', chdir = T)
 source('../../../includes/method_newton.R', chdir = T)
+source('../../../includes/integralS.R', chdir = T)
 
 f1 <- function(x) {
   return (x ^ 2 - cos(x))
@@ -21,6 +22,9 @@ f2 <- function(v) {
 }
 f3 <- function(x) {
   return (1 / (1 + x))
+}
+f3s <- function(a, b) {
+  return (log((1+b)/(1+a)))
 }
 
 task4GraphicPercise = 10
@@ -125,23 +129,31 @@ ui <- navbarPage(
     "Завдання 3",
     titlePanel("Методи знаходження інтегралів"),
     withMathJax(),
-    tags$h3("Формула: \\(\\int_{a}^{b} \\frac{1}{1+x}\\)"),
+    tags$h3("Формула: \\(\\int_{a}^{b} \\frac{1}{1+x}dx\\)"),
     
     sidebarLayout(
       sidebarPanel(
         sliderInput(
-          "integralBorders",
+          "task3borders",
           "Межі інтегрування:",
-          min = -1.1,
-          max = -0.9,
-          step = 0.01,
-          value = c(-1.1, -0.9)
+          min = -0.9,
+          max = 4,
+          step = 0.05,
+          value = c(1, 1.5)
+        ),
+        sliderInput(
+          "task3precision",
+          "Точність:",
+          min = 1,
+          max = 5,
+          step = 1,
+          value = 3
         )
       ),
       
       mainPanel(
         plotOutput("task3plot"),
-        DT::dataTableOutput("task2datatable")
+        DT::dataTableOutput("task3datatable")
       )
     )
   ),
@@ -175,6 +187,10 @@ ui <- navbarPage(
         )
       )
     )
+  ),
+  tabPanel(
+    "Презентація",
+    includeHTML("html/slides.html")
   )
   
 )
@@ -201,7 +217,8 @@ server <- function(input, output, session) {
         result <- dichotomy(f1, Xs, Xe, y, 10^-precision)
       },
       newton={
-        result <- nm.newton(f1, df1, Xs, Xe, y, 10^-precision)
+        updateNumericInput(session, "y", value = 0)
+        result <- nm.newton(f1, df1, Xs, Xe, 10^-precision)
       }
     )
 
@@ -293,7 +310,62 @@ server <- function(input, output, session) {
       )
     }
   })
-  
+
+  # TAsk3
+  precisions <- c(10, 20, 50, 100, 1000)
+
+  output$task3plot <- renderPlot({
+    Xs <- input$task3borders[1]
+    Xe <- input$task3borders[2]
+
+    runs <- 100000
+    x <- seq(Xs, Xe, length.out=runs)
+    y <- f3(x)
+    minY <- ifelse(min(y) > 0, 0, ifelse(min(y) < -100, -100, min(y)))
+    maxY <- ifelse(max(y) < 0, 0, ifelse(max(y) > 100, 100, max(y)))
+    plot(x, y, type='l', ylim=c(minY, maxY))
+    abline(h=0)
+
+    analitV <- f3s(Xs, Xe)
+
+    m = matrix(
+      data = c(
+        analitV,  0,  0,  0,  0,
+        analitV,  0,  0,  0,  0,
+        analitV,  0,  0,  0,  0,
+        analitV,  0,  0,  0,  0,
+        analitV,  0,  0,  0,  0
+      ),
+      nrow = 5,
+      ncol = 5,
+      byrow = TRUE,
+      dimnames = list(
+        precisions,
+        c('Аналітичне значення', 'Метод прямокутників', 'Метод трапецій', 'Метод Симпсона', 'Метод Монте-Карло')
+      )
+    )
+
+    methods = c(integralS.rectangle, integralS.trapeze, integralS.simpson, integralS.monteCarlo)
+    for (Mi in seq_along(methods)) {
+      for (Pi in seq_along(precisions)) {
+        col <- Mi + 1
+        row <- Pi
+        method <- methods[[Mi]]
+        precision <- precisions[Pi]
+        m[row, col] = method(Xs, Xe, f3, precision, Pi == input$task3precision)
+      }
+    }
+
+    output$task3datatable <- DT::renderDataTable(
+      m,
+      options = list(
+        'paging' = FALSE,
+        'searching' = FALSE
+      )
+    )
+    # integralS.monteCarlo(Xs, Xe, f3, precisions[input$task3precision], plot=TRUE)
+  })
+
   # Task4
   output$task4plot <- renderPlot({
     left  <- input$task4borders[1]
