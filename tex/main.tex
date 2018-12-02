@@ -1,0 +1,149 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{minted,xcolor}
+\usemintedstyle{manni}
+\definecolor{bg}{HTML}{ffffff}
+\usepackage{mathtext}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage[english,ukrainian]{babel}
+\usepackage[a4paper, total={7in, 9.5in}]{geometry}
+
+\usepackage{listings}
+\usepackage{lipsum}
+
+\title{Числові методи ЕОМ}
+\selectlanguage{ukrainian}
+\author{Сергій Поліщук}
+\date{1984/02/14}
+\selectlanguage{english}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\clearpage
+\section{Розв'язування нелінійних рівнянь з однією змінною}
+\subsection{Розбиття на відрізки} \label{subsection}
+\subsection{Метод ітерацій} \label{subsection}
+\subsection{Метод дихотомії} \label{subsection}
+\subsection{Метод Нютона} \label{subsection}
+
+\clearpage
+\section{Резонансні частоти для заданих коефіцієнтів}
+
+\clearpage
+\section{Методи знаходження площі інтеграла}
+\subsection{Аналітичний метод}
+Аналітичний метод зводиться до обчислення визначенного інтегралу за формулою:
+\begin{equation} \label{eq:1}
+\int_{a}^{b}\frac{1}{1+x}dx = ln\left ( \frac{1+b}{1+a} \right )
+\end{equation}
+Що для відрізку ві 0 до 3 дорінює 1.38629436111989
+\subsection{Метод прямокутників} \label{integralRectangle}
+
+Вісь X розбивається на скінченну кількість рівних відрізків. 
+По кожному X знаходиться значення функції (Y) і обраховується площа такого прямокутника
+\begin{figure}[ht]
+    \centering
+    \def\svgwidth{\columnwidth}
+    \caption{Графічна інтерпретація методу прямокутників}\label{integralRectangleFigure}
+    \input{integralS_rectangle.pdf_tex}
+\end{figure}
+
+На графіку ~\ref{integralRectangleFigure} кожен прямокутник одним кутом виходить за графік, саме в цьому проявляється похибка розв'язку. Чим меньші відрізки по вісі X тим менша похибка.
+
+\begin{listing}[ht]
+\inputminted[
+	firstline=9, 
+	lastline=28, 
+	linenos, 
+	bgcolor=bg,
+    baselinestretch=1.2,
+    framesep=2mm]{R}{../includes/integralS.R}
+\caption{Метод прямокутників}\label{integralRectangleListing}
+\label{listing:1}
+\end{listing}
+
+В модулі integralS.R реалізація методу прямокутників інкапсульована у функції integralS.rectangle. Функція приймає 4 обов'язкових аргумента, та одни не обов'язковий plot, що відповідає за візуалізацію метода
+
+\clearpage
+\subsection{Метод трапецій}
+
+\begin{figure}[ht]
+    \centering
+    \def\svgwidth{\columnwidth}
+    \caption{Графічна інтерпретація методу трапецій}\label{integralTrapezeFigure}
+    \input{integralS_trapeze.pdf_tex}
+\end{figure}
+
+\begin{listing}[ht]
+\inputminted[
+	firstline=27, 
+	lastline=43, 
+	linenos, 
+	bgcolor=bg,
+    baselinestretch=1.2,
+    framesep=2mm]{R}{../includes/integralS.R}
+\caption{Метод трапецій}
+\label{listing:1}
+\end{listing}
+
+\clearpage
+\subsection{Метод Симпсона} \label{subsection}
+
+\begin{figure}[ht]
+    \centering
+    \def\svgwidth{\columnwidth}
+    \caption{Графічна інтерпретація методу Сімпсона}\label{integralSimpsonFigure}
+    \input{integralS_simpson.pdf_tex}
+\end{figure}
+
+\begin{listing}[ht]
+\inputminted[
+	firstline=57, 
+	lastline=74, 
+	linenos, 
+	bgcolor=bg,
+    baselinestretch=1.2,
+    framesep=2mm]{R}{../includes/integralS.R}
+\caption{Метод Сімпсона}
+\label{listing:1}
+\end{listing}
+
+
+\subsection{Метод Монте-Карло} \label{subsection}
+\begin{listing}[ht]
+\inputminted[
+	firstline=30, 
+	lastline=52, 
+	linenos, 
+	bgcolor=bg,
+    baselinestretch=1.2,
+    framesep=2mm]{R}{../includes/integralS.R}
+\caption{Метод Монте-Карло}
+\label{listing:1}
+\end{listing}
+
+\clearpage
+\section{Інтерполяційний многочлен Лагранжа}
+
+\clearpage
+\section{Висновки}
+
+  
+
+
+
+
+
+
+\clearpage
+\section{Лістинг коду} \label{subsection}
+\renewcommand\listoflistingscaption{}
+\listoflistings
+
+\end{document}

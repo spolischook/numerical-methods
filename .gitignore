@@ -2,3 +2,12 @@
 .Rhistory
 .RData
 .Ruserdata
+
+/tex/_minted-main/
+/tex/*.toc
+/tex/*.dvi
+/tex/*.aux
+/tex/*.log
+/tex/*.lol
+/tex/*.gz
+/tex/main.pdf
